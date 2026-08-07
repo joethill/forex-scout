@@ -1,47 +1,50 @@
-// Forex Scout V3 - OANDA Connector
+// Forex Scout V3 - OANDA Live Connector
 
 const OANDA_URL = "https://api-fxpractice.oanda.com";
 
 let apiToken = "";
+let accountID = "";
 
-
-function setToken(token){
+function setCredentials(token, account){
     apiToken = token;
+    accountID = account;
 }
 
 
 async function getPrice(pair){
 
-    if(!apiToken){
-        return null;
-    }
-
     try {
 
-        let response = await fetch(
-            `${OANDA_URL}/v3/accounts/YOUR_ACCOUNT_ID/pricing?instruments=${pair}`,
-            {
-                headers:{
-                    "Authorization": "Bearer " + apiToken
-                }
+        const response = await fetch(
+        `${OANDA_URL}/v3/accounts/${accountID}/pricing?instruments=${pair}`,
+        {
+            headers:{
+                "Authorization": "Bearer " + apiToken,
+                "Content-Type": "application/json"
             }
-        );
+        });
 
+        const data = await response.json();
 
-        let data = await response.json();
+        if(data.prices){
 
-        let price =
-        data.prices[0].closeoutBid;
+            return {
+                pair: pair,
+                bid: data.prices[0].closeoutBid,
+                ask: data.prices[0].closeoutAsk
+            };
 
-
-        return price;
-
-
-    } catch(error){
-
-        console.log(error);
+        }
 
         return null;
+
+    }
+
+    catch(error){
+
+        console.log(error);
+        return null;
+
     }
 
 }

@@ -1,107 +1,129 @@
 <!DOCTYPE html>
 <html>
 <head>
+
 <title>Forex Scout V3</title>
+
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
+
 body {
-    font-family: Arial, sans-serif;
-    background:#111;
-    color:white;
-    padding:20px;
+font-family: Arial;
+background:#111;
+color:white;
+padding:20px;
 }
 
 .card {
-    background:#1e1e1e;
-    border-radius:12px;
-    padding:15px;
-    margin-bottom:15px;
+background:#222;
+padding:15px;
+border-radius:12px;
+margin-bottom:15px;
 }
 
-.buy {
-    color:#00ff88;
-}
-
-.sell {
-    color:#ff5555;
-}
-
-input, button {
-    padding:10px;
-    width:100%;
-    margin-top:8px;
-    border-radius:8px;
+input,button {
+width:100%;
+padding:12px;
+margin-top:10px;
+border-radius:8px;
 }
 
 button {
-    background:#008cff;
-    color:white;
-    border:none;
+background:#008cff;
+color:white;
+border:none;
 }
+
+.buy {
+color:#00ff88;
+}
+
+.sell {
+color:#ff5555;
+}
+
 </style>
 
 </head>
+
 
 <body>
 
 <h1>🚀 Forex Scout V3</h1>
 
-<div class="card">
-<h2>OANDA Connection</h2>
-<input id="token" placeholder="Paste OANDA API Token">
 
-<input id="account" placeholder="Paste OANDA Account ID">
+<div class="card">
+
+<h2>OANDA Setup</h2>
+
+<input id="token" placeholder="OANDA API Token">
+
+<input id="account" placeholder="OANDA Account ID">
 
 <button onclick="connect()">Connect</button>
 
-<p id="status">Waiting for connection...</p>
-</div>
-
-
-<div class="card">
-<h2>Live Scanner</h2>
-
-<div id="pairs">
-Loading...
-</div>
+<p id="status">
+Not connected
+</p>
 
 </div>
 
 
 <div class="card">
-<h2>Top Signal</h2>
+
+<h2>Live Quotes</h2>
+
+<div id="quotes">
+Waiting...
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h2>Sniper Signal</h2>
 
 <div id="signal">
-Waiting for data...
+Waiting...
 </div>
 
 </div>
+
+
+
+<script src="oanda.js"></script>
+<script src="scanner.js"></script>
 
 
 <script>
 
-let connected=false;
-
-
 function connect(){
 
-let token=document.getElementById("token").value;
+let token =
+document.getElementById("token").value;
 
-if(token.length>10){
+let account =
+document.getElementById("account").value;
 
-connected=true;
 
-document.getElementById("status").innerHTML=
-"✅ OANDA Token Loaded";
+if(token && account){
 
-scan();
+setCredentials(token,account);
+
+
+document.getElementById("status").innerHTML =
+"✅ Connected";
+
+
+loadQuotes();
 
 }
 
 else{
 
-alert("Enter your OANDA token");
+alert("Enter OANDA token and account ID");
 
 }
 
@@ -109,95 +131,47 @@ alert("Enter your OANDA token");
 
 
 
-function scan(){
+async function loadQuotes(){
 
-if(!connected) return;
-
-
-let data=[
-{
-pair:"EUR/USD",
-price:"1.16742",
-signal:"BUY",
-confidence:"88"
-},
-
-{
-pair:"GBP/USD",
-price:"1.33891",
-signal:"WAIT",
-confidence:"62"
-},
-
-{
-pair:"USD/JPY",
-price:"147.82",
-signal:"SELL",
-confidence:"84"
-}
-
+let pairs=[
+"EUR_USD",
+"GBP_USD",
+"USD_JPY"
 ];
 
 
-let html="";
+let output="";
 
 
-data.forEach(x=>{
+for(let pair of pairs){
 
-html+=`
-
-<div class="card">
-
-<h3>${x.pair}</h3>
-
-Price: ${x.price}<br>
-
-Signal:
-
-<span class="${x.signal.toLowerCase()}">
-${x.signal}
-</span>
-
-<br>
-
-Confidence:
-${x.confidence}%
-
-</div>
-
-`;
-
-});
+let price =
+await getPrice(pair);
 
 
-document.getElementById("pairs").innerHTML=html;
+if(price){
 
+output +=
+pair +
+" : " +
+price +
+"<br>";
 
-document.getElementById("signal").innerHTML=
-
-`
-<h2>EUR/USD</h2>
-
-<h3 class="buy">BUY</h3>
-
-Confidence: 88%
-
-<br><br>
-
-Entry: 1.16730<br>
-
-Stop: 1.16550<br>
-
-Target: 1.17050
-
-`;
+}
 
 }
 
 
-<script src="oanda.js"></script>
-<script>
+document.getElementById("quotes").innerHTML =
+output;
+
+
+}
+
+
+</script>
 
 
 </body>
+
 </html>

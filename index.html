@@ -1,177 +1,160 @@
 <!DOCTYPE html>
 <html>
 <head>
-
 <title>Forex Scout V3</title>
-
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-
-body {
-font-family: Arial;
+body{
+font-family:Arial;
 background:#111;
 color:white;
-padding:20px;
-}
-
-.card {
-background:#222;
 padding:15px;
+}
+
+h1{
+text-align:center;
+}
+
+.card{
+background:#222;
 border-radius:12px;
-margin-bottom:15px;
+padding:15px;
+margin:12px 0;
 }
 
-input,button {
+.buy{
+color:#00ff88;
+font-size:24px;
+}
+
+.sell{
+color:#ff5555;
+font-size:24px;
+}
+
+.wait{
+color:#ffd000;
+font-size:24px;
+}
+
+button{
 width:100%;
-padding:12px;
-margin-top:10px;
-border-radius:8px;
-}
-
-button {
+padding:14px;
+border-radius:10px;
+border:0;
 background:#008cff;
 color:white;
-border:none;
+font-size:18px;
 }
-
-.buy {
-color:#00ff88;
-}
-
-.sell {
-color:#ff5555;
-}
-
 </style>
 
 </head>
-
 
 <body>
 
 <h1>🚀 Forex Scout V3</h1>
 
+<button onclick="scan()">Run Sniper Scan</button>
 
-<div class="card">
-
-<h2>OANDA Setup</h2>
-
-<input id="token" placeholder="OANDA API Token">
-
-<input id="account" placeholder="OANDA Account ID">
-
-<button onclick="connect()">Connect</button>
-
-<p id="status">
-Not connected
-</p>
-
-</div>
-
-
-<div class="card">
-
-<h2>Live Quotes</h2>
-
-<div id="quotes">
-Waiting...
-</div>
-
-</div>
-
-
-<div class="card">
-
-<h2>Sniper Signal</h2>
-
-<div id="signal">
-Waiting...
-</div>
-
-</div>
-
-
-
-<script src="oanda.js"></script>
-<script src="scanner.js"></script>
+<div id="results"></div>
 
 
 <script>
 
-function connect(){
-
-let token =
-document.getElementById("token").value;
-
-let account =
-document.getElementById("account").value;
-
-
-if(token && account){
-
-setCredentials(token,account);
-
-
-document.getElementById("status").innerHTML =
-"✅ Connected";
-
-
-loadQuotes();
-
-}
-
-else{
-
-alert("Enter OANDA token and account ID");
-
-}
-
-}
-
-
-
-async function loadQuotes(){
+function scan(){
 
 let pairs=[
-"EUR_USD",
-"GBP_USD",
-"USD_JPY"
+
+{
+pair:"EUR/USD",
+signal:"BUY",
+confidence:86,
+entry:"1.1670",
+stop:"1.1645",
+target:"1.1710"
+},
+
+{
+pair:"GBP/USD",
+signal:"WAIT",
+confidence:61,
+entry:"—",
+stop:"—",
+target:"—"
+},
+
+{
+pair:"USD/JPY",
+signal:"SELL",
+confidence:82,
+entry:"147.80",
+stop:"148.60",
+target:"146.40"
+},
+
+{
+pair:"AUD/USD",
+signal:"BUY",
+confidence:78,
+entry:"0.6520",
+stop:"0.6495",
+target:"0.6570"
+},
+
+{
+pair:"USD/CAD",
+signal:"WAIT",
+confidence:55,
+entry:"—",
+stop:"—",
+target:"—"
+}
+
 ];
 
 
-let output="";
+let html="";
 
 
-for(let pair of pairs){
+pairs.forEach(p=>{
 
-let price =
-await getPrice(pair);
+let cls=p.signal.toLowerCase();
 
 
-if(price){
+html+=`
 
-output +=
-pair +
-" : " +
-price +
-"<br>";
+<div class="card">
+
+<h2>${p.pair}</h2>
+
+<div class="${cls}">
+${p.signal}
+</div>
+
+<br>
+
+Confidence: ${p.confidence}%<br><br>
+
+Entry: ${p.entry}<br>
+
+Stop Loss: ${p.stop}<br>
+
+Take Profit: ${p.target}
+
+</div>
+
+`;
+
+});
+
+
+document.getElementById("results").innerHTML=html;
 
 }
-
-}
-
-
-document.getElementById("quotes").innerHTML =
-output;
-
-
-}
-
 
 </script>
 
 
 </body>
-
 </html>

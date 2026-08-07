@@ -182,7 +182,29 @@ reasons:[
 
 }
 
+async function getLivePrice(pair){
 
+try{
+
+let symbol = pair.replace("/","");
+
+let response = await fetch(
+`https://api.frankfurter.app/latest?from=${symbol.substring(0,3)}&to=${symbol.substring(3,6)}`
+);
+
+let data = await response.json();
+
+return data.rates[symbol.substring(3,6)];
+
+}
+
+catch(error){
+
+return "Unavailable";
+
+}
+
+}
 function runScanner(){
 
 let pairs=[
@@ -202,9 +224,84 @@ let html="";
 pairs.forEach(pair=>{
 
 
-let trade =
-createTrade(pair);
+async function runScanner(){
 
+let pairs=[
+
+"EUR/USD",
+"GBP/USD",
+"USD/JPY",
+"AUD/USD",
+"USD/CAD"
+
+];
+
+
+let html="";
+
+
+for(let pair of pairs){
+
+
+let price = await getLivePrice(pair);
+
+
+let trade = createTrade(pair);
+
+
+html += `
+
+<div class="card">
+
+<h2>${trade.pair}</h2>
+
+<div class="${trade.signal.toLowerCase()}">
+${trade.signal}
+</div>
+
+<div class="score">
+Sniper Score: ${trade.score}/100
+</div>
+
+<br>
+
+Live Price:
+${price}
+
+<br><br>
+
+Entry:
+${trade.entry}
+
+<br><br>
+
+Stop:
+${trade.stop}
+
+<br><br>
+
+Target:
+${trade.target}
+
+<div class="reason">
+
+<b>Why:</b><br>
+
+${trade.reasons.join("<br>")}
+
+</div>
+
+</div>
+
+`;
+
+}
+
+
+document.getElementById("results").innerHTML=html;
+
+
+}
 
 let css =
 trade.signal.toLowerCase();

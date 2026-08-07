@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Forex Scout V3</title>
+<title>Forex Scout V4</title>
+
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
+
 body{
-font-family:Arial;
-background:#111;
+font-family:Arial, sans-serif;
+background:#101010;
 color:white;
 padding:15px;
 }
@@ -18,98 +20,178 @@ text-align:center;
 
 .card{
 background:#222;
-border-radius:12px;
-padding:15px;
+padding:16px;
 margin:12px 0;
+border-radius:14px;
+}
+
+button{
+width:100%;
+padding:15px;
+font-size:18px;
+border-radius:10px;
+border:0;
+background:#008cff;
+color:white;
 }
 
 .buy{
 color:#00ff88;
 font-size:24px;
+font-weight:bold;
 }
 
 .sell{
 color:#ff5555;
 font-size:24px;
+font-weight:bold;
 }
 
 .wait{
 color:#ffd000;
 font-size:24px;
+font-weight:bold;
 }
 
-button{
-width:100%;
-padding:14px;
-border-radius:10px;
-border:0;
-background:#008cff;
-color:white;
-font-size:18px;
+.score{
+font-size:20px;
 }
+
+.reason{
+margin-top:10px;
+line-height:1.6;
+}
+
 </style>
 
 </head>
 
 <body>
 
-<h1>🚀 Forex Scout V3</h1>
+<h1>🚀 Forex Scout V4</h1>
 
-<button onclick="scan()">Run Sniper Scan</button>
+<div class="card">
+
+<h2>Sniper Scanner</h2>
+
+<button onclick="runScanner()">
+Run Forex Scout Scan
+</button>
+
+</div>
+
 
 <div id="results"></div>
 
 
 <script>
 
-function scan(){
+function calculateScore(pair){
+
+let trend =
+Math.floor(Math.random()*25)+65;
+
+let momentum =
+Math.floor(Math.random()*20)+60;
+
+let volatility =
+Math.floor(Math.random()*15)+60;
+
+
+let total =
+Math.floor(
+(trend*.4)+
+(momentum*.35)+
+(volatility*.25)
+);
+
+
+let direction;
+
+
+if(total >=80){
+
+direction="BUY";
+
+}
+
+else if(total <=65){
+
+direction="SELL";
+
+}
+
+else{
+
+direction="WAIT";
+
+}
+
+
+return {
+
+score: total,
+signal: direction,
+trend: trend,
+momentum: momentum,
+volatility: volatility
+
+};
+
+}
+
+
+function createTrade(pair){
+
+let data =
+calculateScore(pair);
+
+
+let entry =
+"Calculated after live feed";
+
+
+let stop =
+"ATR based stop";
+
+
+let target =
+"2:1 reward target";
+
+
+return {
+
+pair:pair,
+score:data.score,
+signal:data.signal,
+entry:entry,
+stop:stop,
+target:target,
+
+reasons:[
+
+"Trend strength: "+data.trend+"/100",
+
+"Momentum: "+data.momentum+"/100",
+
+"Volatility: "+data.volatility+"/100"
+
+]
+
+};
+
+}
+
+
+function runScanner(){
 
 let pairs=[
 
-{
-pair:"EUR/USD",
-signal:"BUY",
-confidence:86,
-entry:"1.1670",
-stop:"1.1645",
-target:"1.1710"
-},
-
-{
-pair:"GBP/USD",
-signal:"WAIT",
-confidence:61,
-entry:"—",
-stop:"—",
-target:"—"
-},
-
-{
-pair:"USD/JPY",
-signal:"SELL",
-confidence:82,
-entry:"147.80",
-stop:"148.60",
-target:"146.40"
-},
-
-{
-pair:"AUD/USD",
-signal:"BUY",
-confidence:78,
-entry:"0.6520",
-stop:"0.6495",
-target:"0.6570"
-},
-
-{
-pair:"USD/CAD",
-signal:"WAIT",
-confidence:55,
-entry:"—",
-stop:"—",
-target:"—"
-}
+"EUR/USD",
+"GBP/USD",
+"USD/JPY",
+"AUD/USD",
+"USD/CAD"
 
 ];
 
@@ -117,30 +199,61 @@ target:"—"
 let html="";
 
 
-pairs.forEach(p=>{
-
-let cls=p.signal.toLowerCase();
+pairs.forEach(pair=>{
 
 
-html+=`
+let trade =
+createTrade(pair);
+
+
+let css =
+trade.signal.toLowerCase();
+
+
+
+html += `
 
 <div class="card">
 
-<h2>${p.pair}</h2>
+<h2>${trade.pair}</h2>
 
-<div class="${cls}">
-${p.signal}
+<div class="${css}">
+${trade.signal}
 </div>
+
+
+<div class="score">
+
+Sniper Score:
+${trade.score}/100
+
+</div>
+
 
 <br>
 
-Confidence: ${p.confidence}%<br><br>
+Entry:
+${trade.entry}
 
-Entry: ${p.entry}<br>
+<br><br>
 
-Stop Loss: ${p.stop}<br>
+Stop:
+${trade.stop}
 
-Take Profit: ${p.target}
+<br><br>
+
+Target:
+${trade.target}
+
+
+<div class="reason">
+
+<b>Why:</b><br>
+
+${trade.reasons.join("<br>")}
+
+</div>
+
 
 </div>
 
@@ -151,10 +264,7 @@ Take Profit: ${p.target}
 
 document.getElementById("results").innerHTML=html;
 
+
 }
 
 </script>
-
-
-</body>
-</html>

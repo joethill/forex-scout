@@ -225,7 +225,7 @@ return "Error";
 
 }
 }
-function runScanner(){
+async function runScanner(){
 
 let pairs=[
 
@@ -234,6 +234,74 @@ let pairs=[
 "USD/JPY",
 "AUD/USD",
 "USD/CAD"
+
+];
+
+
+let html="";
+
+
+for(let pair of pairs){
+
+
+let price = await getTwelvePrice(pair);
+
+
+let trade = createTrade(pair);
+
+
+html += `
+
+<div class="card">
+
+<h2>${trade.pair}</h2>
+
+<div class="${trade.signal.toLowerCase()}">
+${trade.signal}
+</div>
+
+<div class="score">
+Sniper Score: ${trade.score}/100
+</div>
+
+<br>
+
+<b>Live Price:</b> ${price}
+
+<br><br>
+
+Entry:
+${trade.entry}
+
+<br><br>
+
+Stop:
+${trade.stop}
+
+<br><br>
+
+Target:
+${trade.target}
+
+<div class="reason">
+
+<b>Why:</b><br>
+
+${trade.reasons.join("<br>")}
+
+</div>
+
+</div>
+
+`;
+
+}
+
+
+document.getElementById("results").innerHTML=html;
+
+
+}
 
 ];
 

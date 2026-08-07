@@ -203,7 +203,27 @@ catch(error){
 return "Unavailable";
 
 }
+async function getTwelvePrice(symbol){
 
+try{
+
+let response = await fetch(
+`https://api.twelvedata.com/price?symbol=${symbol}&apikey=${TWELVE_KEY}`
+);
+
+let data = await response.json();
+
+return data.price || "No price";
+
+}
+
+catch(error){
+
+return "Error";
+
+}
+
+}
 }
 function runScanner(){
 
